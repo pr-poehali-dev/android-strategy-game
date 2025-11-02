@@ -1,89 +1,18 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-
-interface Resource {
-  id: string;
-  name: string;
-  amount: number;
-  icon: string;
-  color: string;
-}
-
-interface Building {
-  id: string;
-  name: string;
-  level: number;
-  maxLevel: number;
-  icon: string;
-  description: string;
-  productionRate?: { resource: string; amount: number };
-  upgradeCost: { [key: string]: number };
-}
-
-interface Hero {
-  id: string;
-  name: string;
-  level: number;
-  experience: number;
-  maxExperience: number;
-  class: string;
-  avatar: string;
-  health: number;
-  maxHealth: number;
-  attack: number;
-  defense: number;
-  magic: number;
-  abilities: { name: string; icon: string; description: string }[];
-  equipment?: { slot: string; name: string; bonus: string }[];
-}
-
-interface Territory {
-  id: string;
-  name: string;
-  status: 'conquered' | 'available' | 'locked';
-  difficulty: number;
-  rewards: { [key: string]: number };
-  enemy: string;
-}
-
-interface BattleUnit {
-  type: string;
-  count: number;
-  icon: string;
-  attack: number;
-  defense: number;
-  cost: { [key: string]: number };
-}
-
-interface Quest {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  status: 'available' | 'in_progress' | 'completed';
-  progress: number;
-  maxProgress: number;
-  rewards: { [key: string]: number };
-  experienceReward: number;
-}
-
-interface ShopItem {
-  id: string;
-  name: string;
-  type: 'weapon' | 'armor' | 'artifact';
-  icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  bonus: string;
-  cost: { [key: string]: number };
-  slot: string;
-}
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Resource, Building, Hero, Territory, BattleUnit, Quest, ShopItem } from '@/types/game';
+import KingdomTab from '@/components/game/KingdomTab';
+import HeroesTab from '@/components/game/HeroesTab';
+import ArmyTab from '@/components/game/ArmyTab';
+import MapTab from '@/components/game/MapTab';
+import QuestsTab from '@/components/game/QuestsTab';
+import ShopTab from '@/components/game/ShopTab';
+import BuildingDialog from '@/components/game/BuildingDialog';
+import HeroDialog from '@/components/game/HeroDialog';
+import BattleDialog from '@/components/game/BattleDialog';
+import ShopDialog from '@/components/game/ShopDialog';
 
 const Index = () => {
   const [resources, setResources] = useState<Resource[]>([
@@ -172,9 +101,7 @@ const Index = () => {
         { name: 'Удар щитом', icon: 'Shield', description: 'Оглушает врага на 2 секунды' },
         { name: 'Берсерк', icon: 'Flame', description: '+50% к атаке на 10 секунд' },
       ],
-      equipment: [
-        { slot: 'weapon', name: 'Меч драконов', bonus: '+15 атака' },
-      ],
+      equipment: [{ slot: 'weapon', name: 'Меч драконов', bonus: '+15 атака' }],
     },
     {
       id: 'mage',
@@ -346,9 +273,7 @@ const Index = () => {
       })
     );
 
-    setBuildings((prev) =>
-      prev.map((b) => (b.id === buildingId ? { ...b, level: b.level + 1 } : b))
-    );
+    setBuildings((prev) => prev.map((b) => (b.id === buildingId ? { ...b, level: b.level + 1 } : b)));
 
     setIsDialogOpen(false);
   };
@@ -410,9 +335,7 @@ const Index = () => {
         })
       );
 
-      setQuests((prev) =>
-        prev.map((q) => (q.id === '1' ? { ...q, progress: Math.min(q.progress + 1, q.maxProgress) } : q))
-      );
+      setQuests((prev) => prev.map((q) => (q.id === '1' ? { ...q, progress: Math.min(q.progress + 1, q.maxProgress) } : q)));
     }
 
     setIsBattleDialogOpen(false);
@@ -485,7 +408,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f0a1f] via-[#1a1035] to-[#0f0a1f] text-foreground font-[Cormorant] overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljODdmNTIwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20" />
-      
+
       <div className="relative z-10 container mx-auto px-4 py-8">
         <header className="mb-8 text-center">
           <h1 className="text-5xl font-bold font-[Cinzel] bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2 drop-shadow-[0_0_20px_rgba(155,135,245,0.5)]">
@@ -543,754 +466,73 @@ const Index = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="kingdom">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Здания королевства
-              </h2>
-            </div>
+          <KingdomTab
+            buildings={buildings}
+            resources={resources}
+            canAffordUpgrade={canAffordUpgrade}
+            openBuildingDialog={openBuildingDialog}
+          />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {buildings.map((building, index) => (
-            <Card
-              key={building.id}
-              className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-md border-border/50 p-6 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300 cursor-pointer animate-fade-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-              onClick={() => openBuildingDialog(building)}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border-2 border-primary/50 shadow-lg shadow-primary/20">
-                  <Icon name={building.icon as any} size={32} className="text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{building.name}</h3>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-accent font-bold">Уровень {building.level}</span>
-                    <span className="text-xs text-muted-foreground">/ {building.maxLevel}</span>
-                  </div>
-                </div>
-              </div>
+          <HeroesTab
+            heroes={heroes}
+            onHeroClick={(hero) => {
+              setSelectedHero(hero);
+              setIsHeroDialogOpen(true);
+            }}
+          />
 
-              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{building.description}</p>
+          <ArmyTab battleUnits={battleUnits} resources={resources} onTrainUnit={trainUnit} />
 
-              {building.productionRate && (
-                <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/30">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="TrendingUp" size={16} className="text-accent" />
-                    <span className="text-foreground font-semibold">
-                      +{building.productionRate.amount * building.level}{' '}
-                      {resources.find((r) => r.id === building.productionRate?.resource)?.name} / час
-                    </span>
-                  </div>
-                </div>
-              )}
+          <MapTab
+            territories={territories}
+            resources={resources}
+            onTerritoryClick={(territory) => {
+              setSelectedTerritory(territory);
+              setIsBattleDialogOpen(true);
+            }}
+          />
 
-              <Progress value={(building.level / building.maxLevel) * 100} className="mb-4 h-2" />
+          <QuestsTab quests={quests} resources={resources} onCompleteQuest={completeQuest} />
 
-              <Button
-                className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-bold shadow-lg shadow-primary/30"
-                disabled={building.level >= building.maxLevel || !canAffordUpgrade(building)}
-              >
-                {building.level >= building.maxLevel ? '✓ Максимум' : '⬆ Улучшить'}
-              </Button>
-            </Card>
-          ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="heroes">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Легендарные герои
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {heroes.map((hero, index) => (
-                <Card
-                  key={hero.id}
-                  className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-md border-border/50 p-6 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300 cursor-pointer animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => {
-                    setSelectedHero(hero);
-                    setIsHeroDialogOpen(true);
-                  }}
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <Avatar className="w-20 h-20 text-4xl border-2 border-primary/50 shadow-lg">
-                      <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30">
-                        {hero.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{hero.name}</h3>
-                      <Badge className="bg-accent">{hero.class}</Badge>
-                      <p className="text-sm text-muted-foreground mt-1">Уровень {hero.level}</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-muted-foreground">Опыт</span>
-                        <span className="text-accent font-semibold">{hero.experience} / {hero.maxExperience}</span>
-                      </div>
-                      <Progress value={(hero.experience / hero.maxExperience) * 100} className="h-2 bg-primary/20" />
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-muted-foreground">Здоровье</span>
-                        <span className="text-foreground font-semibold">{hero.health} / {hero.maxHealth}</span>
-                      </div>
-                      <Progress value={(hero.health / hero.maxHealth) * 100} className="h-2" />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-primary/10 rounded p-2 border border-primary/30">
-                        <Icon name="Sword" size={16} className="mx-auto mb-1 text-accent" />
-                        <p className="text-xs text-muted-foreground">Атака</p>
-                        <p className="text-sm font-bold text-foreground">{hero.attack}</p>
-                      </div>
-                      <div className="bg-primary/10 rounded p-2 border border-primary/30">
-                        <Icon name="Shield" size={16} className="mx-auto mb-1 text-accent" />
-                        <p className="text-xs text-muted-foreground">Защита</p>
-                        <p className="text-sm font-bold text-foreground">{hero.defense}</p>
-                      </div>
-                      <div className="bg-primary/10 rounded p-2 border border-primary/30">
-                        <Icon name="Sparkles" size={16} className="mx-auto mb-1 text-accent" />
-                        <p className="text-xs text-muted-foreground">Магия</p>
-                        <p className="text-sm font-bold text-foreground">{hero.magic}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {hero.abilities.map((ability) => (
-                      <div key={ability.name} className="flex items-center gap-2 p-2 bg-secondary/20 rounded border border-secondary/30">
-                        <Icon name={ability.icon as any} size={16} className="text-secondary" />
-                        <span className="text-sm text-foreground font-semibold">{ability.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="army">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Управление армией
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {battleUnits.map((unit, index) => (
-                <Card
-                  key={unit.type}
-                  className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-md border-border/50 p-6 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300 animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border-2 border-primary/50 shadow-lg shadow-primary/20">
-                      <Icon name={unit.icon as any} size={32} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{unit.type}</h3>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <Icon name="Sword" size={14} className="text-accent" />
-                          <span className="text-sm text-muted-foreground">{unit.attack}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Icon name="Shield" size={14} className="text-accent" />
-                          <span className="text-sm text-muted-foreground">{unit.defense}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-bold text-accent">{unit.count}</p>
-                      <p className="text-xs text-muted-foreground">в армии</p>
-                    </div>
-                  </div>
-
-                  <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/30">
-                    <p className="text-xs text-muted-foreground mb-2">Стоимость найма:</p>
-                    <div className="flex gap-3">
-                      {Object.entries(unit.cost).map(([resourceId, cost]) => {
-                        const resource = resources.find((r) => r.id === resourceId);
-                        if (!resource) return null;
-                        return (
-                          <div key={resourceId} className="flex items-center gap-1">
-                            <Icon name={resource.icon as any} size={14} style={{ color: resource.color }} />
-                            <span className="text-sm font-semibold text-foreground">{cost}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-bold shadow-lg shadow-primary/30"
-                    onClick={() => trainUnit(unit.type)}
-                  >
-                    ⚔️ Нанять воина
-                  </Button>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="map">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Карта завоеваний
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {territories.map((territory, index) => (
-                <Card
-                  key={territory.id}
-                  className={`bg-gradient-to-br backdrop-blur-md border-border/50 p-6 transition-all duration-300 animate-fade-in ${
-                    territory.status === 'conquered'
-                      ? 'from-green-900/30 to-card/40 border-green-500/50'
-                      : territory.status === 'available'
-                      ? 'from-card/80 to-card/40 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 cursor-pointer'
-                      : 'from-card/40 to-card/20 opacity-50'
-                  }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                  onClick={() => {
-                    if (territory.status === 'available') {
-                      setSelectedTerritory(territory);
-                      setIsBattleDialogOpen(true);
-                    }
-                  }}
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border-2 border-primary/50 shadow-lg shadow-primary/20">
-                      <Icon name="MapPin" size={32} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{territory.name}</h3>
-                      <div className="flex items-center gap-2">
-                        {territory.status === 'conquered' && <Badge className="bg-green-600">Захвачено</Badge>}
-                        {territory.status === 'available' && <Badge className="bg-accent">Доступно</Badge>}
-                        {territory.status === 'locked' && <Badge className="bg-muted">Закрыто</Badge>}
-                        <div className="flex gap-1">
-                          {Array.from({ length: territory.difficulty }).map((_, i) => (
-                            <Icon key={i} name="Flame" size={12} className="text-destructive" />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground mb-4">
-                    <Icon name="Skull" size={14} className="inline mr-1 text-destructive" />
-                    Враг: <span className="text-foreground font-semibold">{territory.enemy}</span>
-                  </p>
-
-                  <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/30">
-                    <p className="text-xs text-muted-foreground mb-2">Награды за победу:</p>
-                    <div className="flex gap-3 flex-wrap">
-                      {Object.entries(territory.rewards).map(([resourceId, amount]) => {
-                        const resource = resources.find((r) => r.id === resourceId);
-                        if (!resource) return null;
-                        return (
-                          <div key={resourceId} className="flex items-center gap-1">
-                            <Icon name={resource.icon as any} size={16} style={{ color: resource.color }} />
-                            <span className="text-sm font-semibold text-foreground">+{amount}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {territory.status === 'available' && (
-                    <Button className="w-full bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/80 hover:to-destructive/60 text-white font-bold shadow-lg shadow-destructive/30">
-                      ⚔️ В бой!
-                    </Button>
-                  )}
-                  {territory.status === 'conquered' && (
-                    <Button disabled className="w-full bg-green-600/50 text-white font-bold">
-                      ✓ Захвачено
-                    </Button>
-                  )}
-                  {territory.status === 'locked' && (
-                    <Button disabled className="w-full bg-muted text-muted-foreground font-bold">
-                      🔒 Недоступно
-                    </Button>
-                  )}
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="quests">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Задания королевства
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {quests.map((quest, index) => (
-                <Card
-                  key={quest.id}
-                  className={`bg-gradient-to-br backdrop-blur-md border-border/50 p-6 transition-all duration-300 animate-fade-in ${
-                    quest.status === 'completed'
-                      ? 'from-green-900/30 to-card/40 border-green-500/50'
-                      : 'from-card/80 to-card/40 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30'
-                  }`}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border-2 border-primary/50 shadow-lg shadow-primary/20">
-                      <Icon name={quest.icon as any} size={32} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{quest.title}</h3>
-                      {quest.status === 'completed' && <Badge className="bg-green-600">Завершён</Badge>}
-                      {quest.status === 'in_progress' && <Badge className="bg-accent">В процессе</Badge>}
-                      {quest.status === 'available' && <Badge className="bg-muted">Доступен</Badge>}
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{quest.description}</p>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Прогресс</span>
-                      <span className="text-foreground font-semibold">
-                        {quest.progress} / {quest.maxProgress}
-                      </span>
-                    </div>
-                    <Progress value={(quest.progress / quest.maxProgress) * 100} className="h-2" />
-                  </div>
-
-                  <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/30">
-                    <p className="text-xs text-muted-foreground mb-2">Награды:</p>
-                    <div className="flex gap-3 flex-wrap items-center">
-                      {Object.entries(quest.rewards).map(([resourceId, amount]) => {
-                        const resource = resources.find((r) => r.id === resourceId);
-                        if (!resource) return null;
-                        return (
-                          <div key={resourceId} className="flex items-center gap-1">
-                            <Icon name={resource.icon as any} size={16} style={{ color: resource.color }} />
-                            <span className="text-sm font-semibold text-foreground">+{amount}</span>
-                          </div>
-                        );
-                      })}
-                      <div className="flex items-center gap-1">
-                        <Icon name="Star" size={16} className="text-accent" />
-                        <span className="text-sm font-semibold text-foreground">+{quest.experienceReward} опыта</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-bold shadow-lg shadow-primary/30"
-                    disabled={quest.progress < quest.maxProgress || quest.status === 'completed'}
-                    onClick={() => completeQuest(quest.id)}
-                  >
-                    {quest.status === 'completed' ? '✓ Выполнен' : quest.progress >= quest.maxProgress ? '🎁 Получить награду' : '⏳ В процессе'}
-                  </Button>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="shop">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold font-[Cinzel] mb-4 text-primary drop-shadow-[0_0_10px_rgba(155,135,245,0.4)]">
-                Торговая лавка
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {shopItems.map((item, index) => {
-                const rarityColors = {
-                  common: 'from-gray-600/30 to-card/40 border-gray-500/50',
-                  rare: 'from-blue-600/30 to-card/40 border-blue-500/50',
-                  epic: 'from-purple-600/30 to-card/40 border-purple-500/50',
-                  legendary: 'from-amber-600/30 to-card/40 border-amber-500/50',
-                };
-
-                return (
-                  <Card
-                    key={item.id}
-                    className={`bg-gradient-to-br backdrop-blur-md p-6 hover:scale-105 hover:shadow-2xl hover:shadow-primary/30 transition-all duration-300 cursor-pointer animate-fade-in ${rarityColors[item.rarity]}`}
-                    style={{ animationDelay: `${index * 100}ms` }}
-                    onClick={() => {
-                      setSelectedShopItem(item);
-                      setIsShopDialogOpen(true);
-                    }}
-                  >
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border-2 border-primary/50 shadow-lg shadow-primary/20">
-                        <Icon name={item.icon as any} size={32} className="text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold font-[Cinzel] text-foreground mb-1">{item.name}</h3>
-                        <Badge
-                          className={`${
-                            item.rarity === 'legendary'
-                              ? 'bg-amber-600'
-                              : item.rarity === 'epic'
-                              ? 'bg-purple-600'
-                              : item.rarity === 'rare'
-                              ? 'bg-blue-600'
-                              : 'bg-gray-600'
-                          }`}
-                        >
-                          {item.rarity === 'legendary'
-                            ? 'Легендарный'
-                            : item.rarity === 'epic'
-                            ? 'Эпический'
-                            : item.rarity === 'rare'
-                            ? 'Редкий'
-                            : 'Обычный'}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="mb-4 p-3 bg-primary/10 rounded-lg border border-primary/30">
-                      <p className="text-sm text-accent font-semibold">{item.bonus}</p>
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="text-xs text-muted-foreground mb-2">Стоимость:</p>
-                      <div className="flex gap-3">
-                        {Object.entries(item.cost).map(([resourceId, cost]) => {
-                          const resource = resources.find((r) => r.id === resourceId);
-                          if (!resource) return null;
-                          const canAfford = resource.amount >= cost;
-                          return (
-                            <div key={resourceId} className="flex items-center gap-1">
-                              <Icon name={resource.icon as any} size={16} style={{ color: resource.color }} />
-                              <span className={`text-sm font-semibold ${canAfford ? 'text-foreground' : 'text-destructive'}`}>
-                                {cost}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-bold shadow-lg shadow-primary/30">
-                      💰 Купить
-                    </Button>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
+          <ShopTab
+            shopItems={shopItems}
+            resources={resources}
+            onItemClick={(item) => {
+              setSelectedShopItem(item);
+              setIsShopDialogOpen(true);
+            }}
+          />
         </Tabs>
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-border">
-          {selectedBuilding && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-[Cinzel] text-primary flex items-center gap-3">
-                  <Icon name={selectedBuilding.icon as any} size={32} />
-                  {selectedBuilding.name}
-                </DialogTitle>
-                <DialogDescription className="text-base">{selectedBuilding.description}</DialogDescription>
-              </DialogHeader>
+      <BuildingDialog
+        isOpen={isDialogOpen}
+        onClose={setIsDialogOpen}
+        building={selectedBuilding}
+        resources={resources}
+        canAffordUpgrade={canAffordUpgrade}
+        onUpgrade={upgradeBuilding}
+      />
 
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Текущий уровень:</span>
-                  <span className="text-2xl font-bold text-accent">
-                    {selectedBuilding.level} / {selectedBuilding.maxLevel}
-                  </span>
-                </div>
+      <HeroDialog isOpen={isHeroDialogOpen} onClose={setIsHeroDialogOpen} hero={selectedHero} />
 
-                {selectedBuilding.level < selectedBuilding.maxLevel && (
-                  <>
-                    <div className="border-t border-border pt-4">
-                      <h4 className="font-semibold mb-3 text-foreground">Стоимость улучшения:</h4>
-                      <div className="space-y-2">
-                        {Object.entries(selectedBuilding.upgradeCost).map(([resourceId, cost]) => {
-                          const resource = resources.find((r) => r.id === resourceId);
-                          if (!resource) return null;
-                          const canAfford = resource.amount >= cost;
-                          return (
-                            <div key={resourceId} className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <Icon name={resource.icon as any} size={20} style={{ color: resource.color }} />
-                                <span className={canAfford ? 'text-foreground' : 'text-destructive'}>{resource.name}</span>
-                              </div>
-                              <span className={`font-bold ${canAfford ? 'text-foreground' : 'text-destructive'}`}>
-                                {cost} ({resource.amount})
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+      <BattleDialog
+        isOpen={isBattleDialogOpen}
+        onClose={setIsBattleDialogOpen}
+        territory={selectedTerritory}
+        battleUnits={battleUnits}
+        resources={resources}
+        onConquer={conquerTerritory}
+      />
 
-                    <Button
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/80 hover:to-secondary/80 text-white font-bold shadow-lg mt-4"
-                      onClick={() => upgradeBuilding(selectedBuilding.id)}
-                      disabled={!canAffordUpgrade(selectedBuilding)}
-                    >
-                      {canAffordUpgrade(selectedBuilding) ? '⬆ Улучшить здание' : '❌ Недостаточно ресурсов'}
-                    </Button>
-                  </>
-                )}
-
-                {selectedBuilding.level >= selectedBuilding.maxLevel && (
-                  <div className="text-center py-4">
-                    <p className="text-accent font-bold text-lg">✨ Здание достигло максимального уровня!</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isHeroDialogOpen} onOpenChange={setIsHeroDialogOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-border max-w-md">
-          {selectedHero && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-[Cinzel] text-primary flex items-center gap-3">
-                  <Avatar className="w-12 h-12 text-2xl border-2 border-primary/50">
-                    <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30">
-                      {selectedHero.avatar}
-                    </AvatarFallback>
-                  </Avatar>
-                  {selectedHero.name}
-                </DialogTitle>
-                <DialogDescription className="text-base">
-                  {selectedHero.class} • Уровень {selectedHero.level}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 mt-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Опыт</span>
-                    <span className="text-accent font-semibold">{selectedHero.experience} / {selectedHero.maxExperience}</span>
-                  </div>
-                  <Progress value={(selectedHero.experience / selectedHero.maxExperience) * 100} className="h-3 bg-primary/20" />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Здоровье</span>
-                    <span className="text-foreground font-semibold">{selectedHero.health} / {selectedHero.maxHealth}</span>
-                  </div>
-                  <Progress value={(selectedHero.health / selectedHero.maxHealth) * 100} className="h-3" />
-                </div>
-
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-primary/10 rounded-lg p-3 border border-primary/30 text-center">
-                    <Icon name="Sword" size={20} className="mx-auto mb-1 text-accent" />
-                    <p className="text-xs text-muted-foreground">Атака</p>
-                    <p className="text-lg font-bold text-foreground">{selectedHero.attack}</p>
-                  </div>
-                  <div className="bg-primary/10 rounded-lg p-3 border border-primary/30 text-center">
-                    <Icon name="Shield" size={20} className="mx-auto mb-1 text-accent" />
-                    <p className="text-xs text-muted-foreground">Защита</p>
-                    <p className="text-lg font-bold text-foreground">{selectedHero.defense}</p>
-                  </div>
-                  <div className="bg-primary/10 rounded-lg p-3 border border-primary/30 text-center">
-                    <Icon name="Sparkles" size={20} className="mx-auto mb-1 text-accent" />
-                    <p className="text-xs text-muted-foreground">Магия</p>
-                    <p className="text-lg font-bold text-foreground">{selectedHero.magic}</p>
-                  </div>
-                </div>
-
-                {selectedHero.equipment && selectedHero.equipment.length > 0 && (
-                  <div className="border-t border-border pt-4">
-                    <h4 className="font-semibold mb-3 text-foreground font-[Cinzel]">Экипировка</h4>
-                    <div className="space-y-2">
-                      {selectedHero.equipment.map((item, idx) => (
-                        <div key={idx} className="p-2 bg-accent/10 rounded border border-accent/30">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold text-foreground">{item.name}</span>
-                            <span className="text-xs text-accent">{item.bonus}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground font-[Cinzel]">Способности</h4>
-                  <div className="space-y-3">
-                    {selectedHero.abilities.map((ability) => (
-                      <div key={ability.name} className="p-3 bg-secondary/20 rounded-lg border border-secondary/30">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Icon name={ability.icon as any} size={18} className="text-secondary" />
-                          <span className="text-sm font-bold text-foreground">{ability.name}</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground pl-6">{ability.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isBattleDialogOpen} onOpenChange={setIsBattleDialogOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-border max-w-md">
-          {selectedTerritory && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-[Cinzel] text-primary flex items-center gap-3">
-                  <Icon name="Swords" size={32} className="text-destructive" />
-                  Битва за {selectedTerritory.name}
-                </DialogTitle>
-                <DialogDescription className="text-base">
-                  Сложность: {Array.from({ length: selectedTerritory.difficulty }).map((_, i) => '🔥').join('')}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 mt-4">
-                <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Icon name="Skull" size={20} className="text-destructive" />
-                    <span className="font-bold text-foreground">Противник: {selectedTerritory.enemy}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Победите врага, чтобы захватить территорию и получить награды
-                  </p>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground font-[Cinzel]">Ваша армия</h4>
-                  <div className="space-y-2">
-                    {battleUnits.map((unit) => (
-                      <div key={unit.type} className="flex items-center justify-between p-2 bg-card/40 rounded border border-border/50">
-                        <div className="flex items-center gap-2">
-                          <Icon name={unit.icon as any} size={18} className="text-primary" />
-                          <span className="text-sm text-foreground">{unit.type}</span>
-                        </div>
-                        <span className="text-sm font-bold text-accent">{unit.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground font-[Cinzel]">Награды за победу</h4>
-                  <div className="flex gap-3 flex-wrap">
-                    {Object.entries(selectedTerritory.rewards).map(([resourceId, amount]) => {
-                      const resource = resources.find((r) => r.id === resourceId);
-                      if (!resource) return null;
-                      return (
-                        <div key={resourceId} className="flex items-center gap-2 p-2 bg-primary/10 rounded border border-primary/30">
-                          <Icon name={resource.icon as any} size={18} style={{ color: resource.color }} />
-                          <span className="text-sm font-semibold text-foreground">+{amount}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Button
-                  className="w-full bg-gradient-to-r from-destructive to-destructive/80 hover:from-destructive/80 hover:to-destructive/60 text-white font-bold shadow-lg shadow-destructive/30 text-lg py-6"
-                  onClick={() => conquerTerritory(selectedTerritory.id)}
-                >
-                  ⚔️ Атаковать!
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isShopDialogOpen} onOpenChange={setIsShopDialogOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-border max-w-md">
-          {selectedShopItem && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-[Cinzel] text-primary flex items-center gap-3">
-                  <Icon name={selectedShopItem.icon as any} size={32} />
-                  {selectedShopItem.name}
-                </DialogTitle>
-                <DialogDescription className="text-base">
-                  {selectedShopItem.type === 'weapon'
-                    ? 'Оружие'
-                    : selectedShopItem.type === 'armor'
-                    ? 'Броня'
-                    : 'Артефакт'}{' '}
-                  •{' '}
-                  {selectedShopItem.rarity === 'legendary'
-                    ? 'Легендарный'
-                    : selectedShopItem.rarity === 'epic'
-                    ? 'Эпический'
-                    : selectedShopItem.rarity === 'rare'
-                    ? 'Редкий'
-                    : 'Обычный'}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 mt-4">
-                <div className="p-4 bg-primary/10 rounded-lg border border-primary/30">
-                  <p className="text-sm font-semibold text-accent">{selectedShopItem.bonus}</p>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground">Стоимость:</h4>
-                  <div className="space-y-2">
-                    {Object.entries(selectedShopItem.cost).map(([resourceId, cost]) => {
-                      const resource = resources.find((r) => r.id === resourceId);
-                      if (!resource) return null;
-                      const canAfford = resource.amount >= cost;
-                      return (
-                        <div key={resourceId} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Icon name={resource.icon as any} size={20} style={{ color: resource.color }} />
-                            <span className={canAfford ? 'text-foreground' : 'text-destructive'}>{resource.name}</span>
-                          </div>
-                          <span className={`font-bold ${canAfford ? 'text-foreground' : 'text-destructive'}`}>
-                            {cost} ({resource.amount})
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  <h4 className="font-semibold mb-3 text-foreground">Выберите героя:</h4>
-                  <div className="space-y-2">
-                    {heroes.map((hero) => (
-                      <Button
-                        key={hero.id}
-                        className="w-full justify-start bg-card/60 hover:bg-primary/20 text-foreground border border-border/50"
-                        onClick={() => buyItem(selectedShopItem.id, hero.id)}
-                      >
-                        <Avatar className="w-8 h-8 text-lg mr-2 border border-primary/50">
-                          <AvatarFallback className="bg-gradient-to-br from-primary/30 to-secondary/30">
-                            {hero.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>
-                          {hero.name} • Ур.{hero.level}
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ShopDialog
+        isOpen={isShopDialogOpen}
+        onClose={setIsShopDialogOpen}
+        item={selectedShopItem}
+        heroes={heroes}
+        resources={resources}
+        onBuyItem={buyItem}
+      />
     </div>
   );
 };
